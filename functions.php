@@ -1,28 +1,21 @@
 <?php
 
 //zbieranie danych
-function add_views($postID) {
+function add_hits($postID) {
 	global $wpdb;
 	$post_popularity_graph_table = $wpdb->prefix . 'post_popularity_graph';
 	if (!preg_match('/bot|spider|crawler|slurp|curl|^$/i', $_SERVER['HTTP_USER_AGENT'])) { //jeśli nie istnieje rekord hit_count z podanym ID oraz ID nie jest równe 1 oraz odwiedzający nie jest botem
 		$result = $wpdb->query("INSERT INTO $post_popularity_graph_table (post_id, date) VALUES ($postID, NOW())"); //dodaje do tablicy id postu, date oraz hit
+		$wpdb->query("DELETE FROM $post_popularity_graph_table WHERE date <= NOW() - INTERVAL 30 DAY"); //removes database entry older than 30 days
 	}
 } 
 
-function show_graph($postID, $posnumber, $numberofdays, $ignoredpages, $ignoredcategories) {
+function show_graph($postID, $numberofdays, $ignoredpages, $ignoredcategories) {
 	global $wpdb;
 	$post_popularity_graph_table = $wpdb->prefix . 'post_popularity_graph';
 	if ($wpdb->query("SELECT post_id FROM $post_popularity_graph_table WHERE post_id = $postID")) {
-		$result = $wpdb->get_results("SELECT COUNT(post_id) FROM $post_popularity_graph_table WHERE post_id = $postID GROUP BY CAST(date AS DATE)", ARRAY_A);
-		$date = $wpdb->get_results("SELECT CAST(date AS DATE) FROM $post_popularity_graph_table WHERE post_id = $postID GROUP BY CAST(date AS DATE)", ARRAY_A);
-	}
-
-/*	foreach($result as $key => $row){
-		echo $row['COUNT(post_id)']."<br>";
-		static $i = 0;
-		echo $date[$i]['CAST(date AS DATE)']."<br>";
-		$i++;
-	}*/
+		$result = $wpdb->get_results("SELECT COUNT(post_id) FROM $post_popularity_graph_table WHERE post_id = $postID AND date >= DATE(DATE_SUB(NOW(), INTERVAL $numberofdays DAY)) GROUP BY CAST(date AS DATE)", ARRAY_A);
+		$date = $wpdb->get_results("SELECT CAST(date AS DATE) FROM $post_popularity_graph_table WHERE post_id = $postID AND date >= DATE(DATE_SUB(NOW(), INTERVAL $numberofdays DAY)) GROUP BY CAST(date AS DATE)", ARRAY_A);
 ?>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
@@ -54,6 +47,7 @@ function show_graph($postID, $posnumber, $numberofdays, $ignoredpages, $ignoredc
       var options = {
         hAxis: {
           title: 'Time',
+          textPosition: 'none'
         },
         vAxis: {
           title: 'Visits'
@@ -70,7 +64,7 @@ function show_graph($postID, $posnumber, $numberofdays, $ignoredpages, $ignoredc
 		curveType: 'function'
       };
 
-      var chart = new google.visualization.LineChart(
+      var chart = new google.visualization.AreaChart(
         document.getElementById('ex0'));
 
       chart.draw(data, options);
@@ -81,12 +75,6 @@ function show_graph($postID, $posnumber, $numberofdays, $ignoredpages, $ignoredc
 	<div id="ex0" style="width: 100%;"></div>
 
 <?php
-}
-
-function choose_style($css_sel) {
-	if($css_sel == 1){
-		return 'style-popular-posts-statistics-1.css';
 	}
 }
-
 ?>
