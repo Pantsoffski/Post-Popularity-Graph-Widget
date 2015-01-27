@@ -10,7 +10,7 @@ function add_hits($postID) {
 	}
 } 
 
-function show_graph($postID, $numberofdays, $ignoredpages, $ignoredcategories) {
+function show_graph($postID, $numberofdays) {
 	global $wpdb;
 	$post_popularity_graph_table = $wpdb->prefix . 'post_popularity_graph';
 	if ($wpdb->query("SELECT post_id FROM $post_popularity_graph_table WHERE post_id = $postID")) {
@@ -56,15 +56,17 @@ function show_graph($postID, $numberofdays, $ignoredpages, $ignoredcategories) {
         	position: 'none'
         },
         chartArea: {
-			left: 15,
-			top: 2,
-			width: '85%',
-			height: '85%' 
+			left: '5%',
+			top: '3%',
+			width: '90%',
+			height: '90%' 
 		},
-		curveType: 'function'
+		curveType: 'function',
+		width: '100%',
+		height: '100%'
       };
 
-      var chart = new google.visualization.AreaChart(
+      var chart = new google.visualization.LineChart(
         document.getElementById('ex0'));
 
       chart.draw(data, options);

@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: Post Popularity Graph Widget Lite
+Plugin Name: Post Popularity Chart Widget Lite
 Plugin URI: http://smartfan.pl/
-Description: Widget which displays popularity graph for every post.
+Description: Widget which displays popularity chart / graph for posts.
 Author: Piotr Pesta
 Version: 0.5
 Author URI: http://smartfan.pl/
@@ -79,7 +79,7 @@ function form($instance) {
 function update($new_instance, $old_instance) {
 $instance = $old_instance;
 
-// Dostêpne pola
+// available fields
 $instance['title'] = strip_tags($new_instance['title']);
 $instance['numberofdays'] = strip_tags($new_instance['numberofdays']);
 $instance['ignoredpages'] = strip_tags($new_instance['ignoredpages']);
@@ -91,7 +91,7 @@ return $instance;
 function widget($args, $instance) {
 extract($args);
 
-// to s¹ funkcje widgetu
+// widget variables
 $title = apply_filters('widget_title', $instance['title']);
 $numberofdays = $instance['numberofdays'];
 $numberofdays = trim(preg_replace('/\s+/', '', $numberofdays));
@@ -101,20 +101,26 @@ $ignoredpages = explode(",",$ignoredpages);
 $ignoredcategories = $instance['ignoredcategories'];
 $ignoredcategories = trim(preg_replace('/\s+/', '', $ignoredcategories));
 $ignoredcategories = explode(",",$ignoredcategories);
-echo $before_widget;
-
-// Sprawdzanie, czy istnieje tytu³
-if ($title) {
-echo $before_title . $title . $after_title;
-}
-
 $postID = get_the_ID();
+$catID = get_the_category($postID);
+$postCatID = $catID[0]->cat_ID;
+echo $before_widget;
+	
+	// check is category ID or post ID is banned or not
+	if(in_array($postCatID, $ignoredcategories) || in_array($postID, $ignoredpages)) {
+		add_hits($postID);
+	}else{
+		// check title availability
+		if($title) {
+		echo $before_title . $title . $after_title;
+		}
 
-show_graph($postID, $numberofdays, $ignoredpages, $ignoredcategories);
+		show_graph($postID, $numberofdays);
 
-add_hits($postID);
+		add_hits($postID);
 
-echo $after_widget;
+		echo $after_widget;
+	}
 }
 }
 
