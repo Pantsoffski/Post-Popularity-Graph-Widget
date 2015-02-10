@@ -31,7 +31,7 @@ Or just add .zip file as a new plugin in your Wordpress administration panel.
 
 1. Post Popularity Chart Widget Lite.
 2. Post Popularity Chart Widget Lite visible on right block.
-2. Options menu.
+3. Options menu.
 
 == Changelog ==
 * 0.5
