@@ -29,7 +29,8 @@ Or just add .zip file as a new plugin in your Wordpress administration panel.
 
 == Screenshots ==
 
-1. Post Popularity Chart Widget Lite visible on right block.
+1. Post Popularity Chart Widget Lite.
+2. Post Popularity Chart Widget Lite visible on right block.
 2. Options menu.
 
 == Changelog ==
