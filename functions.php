@@ -5,7 +5,7 @@ function add_hits($postID) {
 	global $wpdb;
 	$post_popularity_graph_table = $wpdb->prefix . 'post_popularity_graph';
 	if (!preg_match('/bot|spider|crawler|slurp|curl|^$/i', $_SERVER['HTTP_USER_AGENT'])) { //jeśli nie istnieje rekord hit_count z podanym ID oraz ID nie jest równe 1 oraz odwiedzający nie jest botem
-		$result = $wpdb->query("INSERT INTO $post_popularity_graph_table (post_id, date) VALUES ($postID, NOW())"); //dodaje do tablicy id postu, date oraz hit
+		$wpdb->query($wpdb->prepare("INSERT INTO $post_popularity_graph_table (post_id, date) VALUES (%d, NOW())", $postID)); //dodaje do tablicy id postu, date oraz hit
 		$wpdb->query("DELETE FROM $post_popularity_graph_table WHERE date <= NOW() - INTERVAL 30 DAY"); //removes database entry older than 30 days
 	}
 } 
@@ -14,8 +14,8 @@ function show_graph($postID, $numberofdays) {
 	global $wpdb;
 	$post_popularity_graph_table = $wpdb->prefix . 'post_popularity_graph';
 	if ($wpdb->query("SELECT post_id FROM $post_popularity_graph_table WHERE post_id = $postID")) {
-		$result = $wpdb->get_results("SELECT COUNT(post_id) FROM $post_popularity_graph_table WHERE post_id = $postID AND date >= DATE(DATE_SUB(NOW(), INTERVAL $numberofdays DAY)) GROUP BY CAST(date AS DATE)", ARRAY_A);
-		$date = $wpdb->get_results("SELECT CAST(date AS DATE) FROM $post_popularity_graph_table WHERE post_id = $postID AND date >= DATE(DATE_SUB(NOW(), INTERVAL $numberofdays DAY)) GROUP BY CAST(date AS DATE)", ARRAY_A);
+		$result = $wpdb->get_results($wpdb->prepare("SELECT COUNT(post_id) FROM $post_popularity_graph_table WHERE post_id = %d AND date >= DATE(DATE_SUB(NOW(), INTERVAL %d DAY)) GROUP BY CAST(date AS DATE)", $postID, $numberofdays), ARRAY_A);
+		$date = $wpdb->get_results($wpdb->prepare("SELECT CAST(date AS DATE) FROM $post_popularity_graph_table WHERE post_id = %d AND date >= DATE(DATE_SUB(NOW(), INTERVAL %d DAY)) GROUP BY CAST(date AS DATE)", $postID, $numberofdays), ARRAY_A);
 ?>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
@@ -56,10 +56,10 @@ function show_graph($postID, $numberofdays) {
         	position: 'none'
         },
         chartArea: {
-			left: '5%',
+			left: '15%',
 			top: '3%',
 			width: '90%',
-			height: '90%' 
+			height: '90%'
 		},
 		curveType: 'function',
 		width: '100%',
