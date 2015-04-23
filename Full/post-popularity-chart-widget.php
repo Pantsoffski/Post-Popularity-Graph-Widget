@@ -8,7 +8,6 @@ Version: 0.6.1
 Author URI: http://smartfan.pl/
 License: GPL12
 */
-
 include 'functions.php';
 
 $options = get_option('post_popularity_graph');

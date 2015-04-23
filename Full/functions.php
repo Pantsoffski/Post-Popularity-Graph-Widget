@@ -8,7 +8,7 @@ function add_hits($postID) {
 		$result = $wpdb->query("INSERT INTO $post_popularity_graph_table (post_id, date) VALUES ($postID, NOW())"); //dodaje do tablicy id postu, date oraz hit
 		$wpdb->query("DELETE FROM $post_popularity_graph_table WHERE date <= NOW() - INTERVAL 30 DAY"); //removes database entry older than 30 days
 	}
-} 
+}
 
 function show_graph($postID, $numberofdays, $chartstyle, $haxistitle, $vaxistitle, $backgroundcolor, $chartcolor) {
 	global $wpdb;
@@ -16,6 +16,31 @@ function show_graph($postID, $numberofdays, $chartstyle, $haxistitle, $vaxistitl
 	if ($wpdb->query("SELECT post_id FROM $post_popularity_graph_table WHERE post_id = $postID")) {
 		$result = $wpdb->get_results("SELECT COUNT(post_id) FROM $post_popularity_graph_table WHERE post_id = $postID AND date >= DATE(DATE_SUB(NOW(), INTERVAL $numberofdays DAY)) GROUP BY CAST(date AS DATE)", ARRAY_A);
 		$date = $wpdb->get_results("SELECT CAST(date AS DATE) FROM $post_popularity_graph_table WHERE post_id = $postID AND date >= DATE(DATE_SUB(NOW(), INTERVAL $numberofdays DAY)) GROUP BY CAST(date AS DATE)", ARRAY_A);
+		
+//przedział dat - listowanie na podstawie $numberofdays
+	$date1 = date("Y, m, d", strtotime("- $numberofdays day"));
+	$date2 = date("Y, m, d");
+	
+	function returnDates($fromdate, $todate) {
+		$fromdate = DateTime::createFromFormat('Y, m, d', $fromdate);
+		$todate = DateTime::createFromFormat('Y, m, d', $todate);
+    		return new DatePeriod(
+        	$fromdate,
+        	new DateInterval('P1D'),
+        	$todate->modify('+1 day')
+    		);
+	}
+	
+	$datePeriod = returnDates($date1, $date2);
+/*	foreach($datePeriod as $dateLoop) {
+		$dateLoop = $dateLoop->format('Y, m, d');
+		if(strstr($dateLoop, '2015, 03, 30')) {
+			continue;
+    		}else{
+			echo $dateLoop, PHP_EOL;
+		}
+	}*/
+
 ?>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
@@ -31,15 +56,13 @@ function show_graph($postID, $numberofdays, $chartstyle, $haxistitle, $vaxistitl
       data.addRows([
 <?php
 		foreach ($result as $key => $row) {
-			static $i = 0;
-			$value = $date[$i]['CAST(date AS DATE)'];
-			++$i;
-			$a = preg_replace("|(\d{4})\-(\d{2})-(\d{2})|", "$1", $value);
-			$b = preg_replace("|(\d{4})\-(\d{2})-(\d{2})|", "$2", $value);
-			$b = (int)$b - 1;
-			$c = preg_replace("|(\d{4})\-(\d{2})-(\d{2})|", "$3", $value);
-			$value = $row['COUNT(post_id)'];
-			echo "[new Date(".(int)$a.", ".$b.", ".(int)$c."), ".(int)$value."],";
+			static $i2 = 0;
+			$value1 = $date[$i2]['CAST(date AS DATE)'];
+			++$i2;
+			$value1 = DateTime::createFromFormat('Y-m-d', $value1);
+			$value1 = $value1->format('Y, m, d');
+			$value2 = $row['COUNT(post_id)'];
+			echo "[new Date(".$value1."), ".(int)$value2."],";
 		}
 ?>
       ]);
@@ -81,4 +104,5 @@ function show_graph($postID, $numberofdays, $chartstyle, $haxistitle, $vaxistitl
 <?php
 	}
 }
+
 ?>
