@@ -55,14 +55,29 @@ function show_graph($postID, $numberofdays, $chartstyle, $haxistitle, $vaxistitl
 
       data.addRows([
 <?php
-		foreach ($result as $key => $row) {
+		foreach ($result as $key => $row) { //pętla wyświetlająca dane
 			static $i2 = 0;
 			$value1 = $date[$i2]['CAST(date AS DATE)'];
 			++$i2;
 			$value1 = DateTime::createFromFormat('Y-m-d', $value1);
-			$value1 = $value1->format('Y, m, d');
+			$compareDate = $value1->format('Y, m, d');
+			$year = $value1->format('Y');
+			$month = $value1->format('m');
+			$month = $month - 1;
+			$day = $value1->format('d');
 			$value2 = $row['COUNT(post_id)'];
-			echo "[new Date(".$value1."), ".(int)$value2."],";
+		}
+		foreach($datePeriod as $dateLoop) { //pętla wyświetlająca zera, jeśli w zadanym okresie w konkretnych dniach nie ma danych
+			$dateLoop1 = $dateLoop->format('Y, m, d');
+			$yearLoop = $dateLoop->format('Y');
+			$monthLoop = $dateLoop->format('m');
+			$monthLoop = $monthLoop - 1;
+			$dayLoop = $dateLoop->format('d');
+			if(strstr($dateLoop1, $compareDate)) {
+				echo "[new Date(".$year.", ".$month.", ".$day."), ".$value2."],";
+    			}else{
+				echo "[new Date(".$yearLoop.", ".$monthLoop.", ".$dayLoop."), 0],";
+			}
 		}
 ?>
       ]);
