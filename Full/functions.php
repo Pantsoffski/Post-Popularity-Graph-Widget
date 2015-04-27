@@ -32,14 +32,19 @@ function show_graph($postID, $numberofdays, $chartstyle, $haxistitle, $vaxistitl
 	}
 	
 	$datePeriod = returnDates($date1, $date2);
-/*	foreach($datePeriod as $dateLoop) {
+
+	foreach($datePeriod as $dateLoop) {
 		$dateLoop = $dateLoop->format('Y, m, d');
-		if(strstr($dateLoop, '2015, 03, 30')) {
-			continue;
-    		}else{
-			echo $dateLoop, PHP_EOL;
-		}
-	}*/
+		$tablica[] = $dateLoop; //zapisuje wyniki w tablicy
+	}
+	foreach($date as $dateMainLoop) {
+		static $i = 0;
+		$dateMainLoop = $date[$i]['CAST(date AS DATE)'];
+		++$i;
+		$dateMainLoop = DateTime::createFromFormat('Y-m-d', $dateMainLoop);
+		$dateMainLoop = $dateMainLoop->format('Y, m, d');
+		$tablica2[] = $dateMainLoop; //zapisuje wyniki w tablicy
+	}
 
 ?>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -55,30 +60,23 @@ function show_graph($postID, $numberofdays, $chartstyle, $haxistitle, $vaxistitl
 
       data.addRows([
 <?php
-		foreach ($result as $key => $row) { //pętla wyświetlająca dane
+	for($i = 0; $i <= $numberofdays; ++$i){
+		$value = $tablica[$i];
+		$valueFormat = DateTime::createFromFormat('Y, m, d', $value);
+		$year = $valueFormat->format('Y');
+		$month = $valueFormat->format('m');
+		$month = $month - 1;
+		$day = $valueFormat->format('d');
+		$valueSet = $year.", ".$month.", ".$day;
+		if(in_array($value, $tablica2)){
 			static $i2 = 0;
-			$value1 = $date[$i2]['CAST(date AS DATE)'];
+			$hitCount = $result[$i2]['COUNT(post_id)'];
 			++$i2;
-			$value1 = DateTime::createFromFormat('Y-m-d', $value1);
-			$compareDate = $value1->format('Y, m, d');
-			$year = $value1->format('Y');
-			$month = $value1->format('m');
-			$month = $month - 1;
-			$day = $value1->format('d');
-			$value2 = $row['COUNT(post_id)'];
+			echo "[new Date(".$valueSet."), ".$hitCount."],";
+		}else{
+			echo "[new Date(".$valueSet."), 0],";
 		}
-		foreach($datePeriod as $dateLoop) { //pętla wyświetlająca zera, jeśli w zadanym okresie w konkretnych dniach nie ma danych
-			$dateLoop1 = $dateLoop->format('Y, m, d');
-			$yearLoop = $dateLoop->format('Y');
-			$monthLoop = $dateLoop->format('m');
-			$monthLoop = $monthLoop - 1;
-			$dayLoop = $dateLoop->format('d');
-			if(strstr($dateLoop1, $compareDate)) {
-				echo "[new Date(".$year.", ".$month.", ".$day."), ".$value2."],";
-    			}else{
-				echo "[new Date(".$yearLoop.", ".$monthLoop.", ".$dayLoop."), 0],";
-			}
-		}
+	}
 ?>
       ]);
 
@@ -88,7 +86,11 @@ function show_graph($postID, $numberofdays, $chartstyle, $haxistitle, $vaxistitl
           textPosition: 'none'
         },
         vAxis: {
-          title: "<?php echo $vaxistitle; ?>"
+          title: "<?php echo $vaxistitle; ?>",
+          format: '0',
+          viewWindow: {
+ 	     	min: 0
+    	  }
         },
         legend: {
         	position: 'none'
