@@ -142,6 +142,7 @@ extract($args);
 $title = apply_filters('widget_title', $instance['title']);
 $numberofdays = $instance['numberofdays'];
 $numberofdays = trim(preg_replace('/\s+/', '', $numberofdays));
+$numberofdays = $numberofdays - 1;
 $ignoredpages = $instance['ignoredpages'];
 $ignoredpages = trim(preg_replace('/\s+/', '', $ignoredpages));
 $ignoredpages = explode(",",$ignoredpages);
