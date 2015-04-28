@@ -33,6 +33,7 @@ function show_graph($postID, $numberofdays, $chartstyle, $haxistitle, $vaxistitl
 	
 	$datePeriod = returnDates($date1, $date2);
 
+//zbieranie dat w tablicach
 	foreach($datePeriod as $dateLoop) {
 		$dateLoop = $dateLoop->format('Y, m, d');
 		$tablica[] = $dateLoop; //zapisuje wyniki w tablicy
