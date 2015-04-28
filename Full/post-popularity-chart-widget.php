@@ -4,7 +4,7 @@ Plugin Name: Post Popularity Chart Widget
 Plugin URI: http://smartfan.pl/
 Description: Widget which displays popularity chart / graph for posts.
 Author: Piotr Pesta
-Version: 0.6.1
+Version: 0.9.2
 Author URI: http://smartfan.pl/
 License: GPL12
 */
