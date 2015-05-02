@@ -15,7 +15,7 @@ $options = get_option('post_popularity_graph');
 register_activation_hook(__FILE__, 'post_popularity_graph_activate'); //akcja podczas aktywacji pluginu
 register_uninstall_hook(__FILE__, 'post_popularity_graph_uninstall'); //akcja podczas deaktywacji pluginu
 
-// instalacja i zak³adanie tabeli w mysql
+// Installation and SQL table creation
 function post_popularity_graph_activate() {
 	global $wpdb;
 	$post_popularity_graph_table = $wpdb->prefix . 'post_popularity_graph';
@@ -26,7 +26,7 @@ function post_popularity_graph_activate() {
 		);");
 }
 
-// podczas odinstalowania - usuwanie tabeli
+// If uninstall - remove SQL table
 function post_popularity_graph_uninstall() {
 	global $wpdb;
 	$post_popularity_graph_table = $wpdb->prefix . 'post_popularity_graph';
@@ -36,17 +36,17 @@ function post_popularity_graph_uninstall() {
 
 class post_popularity_graph extends WP_Widget {
 
-// konstruktor widgetu
+// Widget constructor
 function post_popularity_graph() {
 
 	$this->WP_Widget(false, $name = __('Post Popularity Graph Widget', 'wp_widget_plugin'));
 
 }
 
-// tworzenie widgetu, back end (form)
+// Widget backend
 function form($instance) {
 
-// nadawanie i ³¹czenie defaultowych wartoœci
+// Default values
 	$defaults = array('chartcolor' => '#0033CC', 'backgroundcolor' => '#FFFFFF', 'vaxistitle' => 'Visits', 'haxistitle' => 'Time', 'chartstyle' => 'LineChart', 'ignoredcategories' => '', 'ignoredpages' => '', 'numberofdays' => '10', 'title' => 'Post Popularity Graph');
 	$instance = wp_parse_args( (array) $instance, $defaults );
 ?>
@@ -121,7 +121,7 @@ function form($instance) {
 function update($new_instance, $old_instance) {
 $instance = $old_instance;
 
-// available fields
+// Available fields
 $instance['title'] = strip_tags($new_instance['title']);
 $instance['numberofdays'] = strip_tags($new_instance['numberofdays']);
 $instance['ignoredpages'] = strip_tags($new_instance['ignoredpages']);
@@ -134,11 +134,11 @@ $instance['chartcolor'] = strip_tags($new_instance['chartcolor']);
 return $instance;
 }
 
-// wyswietlanie widgetu, front end (widget)
+// Widget front end
 function widget($args, $instance) {
 extract($args);
 
-// widget variables
+// Widget variables
 $title = apply_filters('widget_title', $instance['title']);
 $numberofdays = $instance['numberofdays'];
 $numberofdays = trim(preg_replace('/\s+/', '', $numberofdays));
@@ -159,11 +159,11 @@ $catID = get_the_category($postID);
 $postCatID = $catID[0]->cat_ID;
 echo $before_widget;
 	
-	// check is category ID or post ID is banned or not
+	// Checking category ID or post ID is banned or not
 	if(in_array($postCatID, $ignoredcategories) || in_array($postID, $ignoredpages)) {
 		add_hits($postID);
 	}else{
-		// check title availability
+		// Check title availability
 		if($title) {
 		echo $before_title . $title . $after_title;
 		}
@@ -177,7 +177,7 @@ echo $before_widget;
 }
 }
 
-// rejestracja widgetu
+// Widget registration
 add_action('widgets_init', create_function('', 'return register_widget("post_popularity_graph");'));
 
 ?>
