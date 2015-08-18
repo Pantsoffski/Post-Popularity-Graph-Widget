@@ -6,8 +6,8 @@ Plugin URI: http://smartfan.pl/
 Tags: widget, chart, graph, diagram, pupular, pupularity, visits, counter
 Author: Piotr Pesta
 Requires at least: 2.8.0
-Tested up to: 4.2
-Stable tag: 1.0.0
+Tested up to: 4.3
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,3 +78,5 @@ Or just add .zip file as a new plugin in your Wordpress administration panel.
 = 1.0.0 =
 * Now you can change: titles of individual axes, the color of chart and its background
 * New chart type (at the moment there are 3 types)
+= 1.0.1 =
+* Wordpress 4.3 compatibility
